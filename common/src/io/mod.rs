@@ -7,5 +7,5 @@ pub fn collect_stdin<T: FromStr>() -> Vec<T> {
         .lines()
         .filter_map(|line| line.ok().map(|line| line.parse::<T>()))
         .filter_map(|value| value.ok())
-        .collect::<_>()
+        .collect()
 }
