@@ -12,13 +12,9 @@ fn main() {
     println!("{}", count_part_1);
 
     // Part 2
-    let windowed_values = values
-        .windows(3)
-        .map(|window| window.iter().sum())
-        .collect::<Vec<i64>>();
-    let count_part_2 = windowed_values
+    let count_part_2 = values
         .iter()
-        .zip(windowed_values.iter().skip(1))
+        .zip(values.iter().skip(3)) // a + b + c < b + c + d iff a < d
         .filter(|(lhs, rhs)| lhs < rhs)
         .count();
     println!("{}", count_part_2);
