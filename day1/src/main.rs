@@ -1,13 +1,7 @@
-use std::io::BufRead;
+use common::io::collect_stdin;
 
 fn main() {
-    let stdin = std::io::stdin();
-    let values = stdin
-        .lock()
-        .lines()
-        .filter_map(|line| line.ok().map(|line| line.parse::<i64>()))
-        .filter_map(|value| value.ok())
-        .collect::<Vec<_>>();
+    let values = collect_stdin::<i64>();
 
     // Part 1
     let count_part_1 = values
