@@ -14,7 +14,7 @@ impl FromStr for Command {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut tokens = s.split_ascii_whitespace();
         let direction = tokens.next();
-        let amount = tokens.next().map(|s| s.parse::<u64>().unwrap());
+        let amount = tokens.next().map(|s| s.parse::<u64>().ok()).flatten();
         match (direction, amount) {
             (Some("up"), Some(v)) => Ok(Command::Up(v)),
             (Some("down"), Some(v)) => Ok(Command::Down(v)),
@@ -26,7 +26,7 @@ impl FromStr for Command {
 
 fn main() {
     let commands = collect_stdin::<Command>();
-    
+
     let mut aim = 0;
     let mut depth = 0;
     let mut horizontal_position = 0;
