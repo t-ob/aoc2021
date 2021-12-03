@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use common::io::collect_stdin_with;
 
 fn bit_weight(bit_position: usize, values: &[u16]) -> u16 {
@@ -20,48 +22,45 @@ fn main() {
 
     let next_power_of_two_bit_position = values
         .iter()
-        .min_by_key(|x| x.leading_zeros())
-        .map(|x| 16 - x.leading_zeros())
+        .map(|x| 16 - x.leading_zeros() as usize)
+        .max()
         .unwrap();
-    let mask: u16 = (1 << next_power_of_two_bit_position) - 1;
 
     // Part 1
-    let mut weights = [0; 16];
-
-    for (bit_position, weight) in (0..16).zip(weights.iter_mut().rev()) {
-        *weight = bit_weight(bit_position, &values);
-    }
-
-    let gamma = weights.iter().fold(0, |a, v| v + (a << 1));
-
+    let mask: u16 = (1 << next_power_of_two_bit_position) - 1;
+    let gamma = (0..next_power_of_two_bit_position)
+        .rev()
+        .fold(0, |acc, bit_position| {
+            bit_weight(bit_position, &values) + (acc << 1)
+        });
     let epsilon = !gamma & mask;
 
     println!("{}", gamma as u32 * epsilon as u32);
 
     // Part 2
-    let mut oxygen_generator_values = values.clone();
-    let mut co2_scrubber_values = values.clone();
+    let mut oxygen_generator_values = VecDeque::from(values.clone());
+    let mut co2_scrubber_values = VecDeque::from(values.clone());
 
-    for (diagnostic_values, xor) in [
+    for (diagnostic_values, y) in [
         (&mut oxygen_generator_values, 0),
         (&mut co2_scrubber_values, 1),
     ] {
-        for bit_position in (0..next_power_of_two_bit_position as usize).rev() {
+        for bit_position in (0..next_power_of_two_bit_position).rev() {
             if diagnostic_values.len() == 1 {
                 break;
             }
-            let weight = bit_weight(bit_position, diagnostic_values);
-            let new_diagnostic_values = diagnostic_values
-                .iter()
-                .filter(|v| 1 & (**v >> bit_position) == weight ^ xor)
-                .map(|v| *v)
-                .collect::<Vec<u16>>();
-            *diagnostic_values = new_diagnostic_values;
+            let next_diagnostic_values = diagnostic_values.drain(..).collect::<Vec<_>>();
+            let weight = bit_weight(bit_position, &next_diagnostic_values);
+            for value in next_diagnostic_values {
+                if 1 & (value >> bit_position) == weight ^ y {
+                    (*diagnostic_values).push_back(value);
+                }
+            }
         }
     }
 
-    let oxygen_generator_rating = oxygen_generator_values[0];
-    let co2_scrubber_rating = co2_scrubber_values[0];
+    let oxygen_generator_rating = oxygen_generator_values.pop_front().unwrap();
+    let co2_scrubber_rating = co2_scrubber_values.pop_front().unwrap();
 
     println!(
         "{}",
