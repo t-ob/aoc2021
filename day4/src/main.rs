@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-use common::io::{collect_stdin_lines, read_line_with};
+use common::io::stdin::{collect_lines_into_vec, read_line_with};
 
 const BOARD_SIZE: usize = 5;
 
@@ -68,7 +68,7 @@ fn main() {
             .map(|s| s.parse::<u16>().ok())
             .collect::<Option<Vec<_>>>()
     }) {
-        let boards = collect_stdin_lines::<Board>("\n\n");
+        let boards = collect_lines_into_vec::<Board>("\n\n");
 
         // Part 1
         let mut boards_part_1 = boards.clone();

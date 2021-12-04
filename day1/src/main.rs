@@ -1,7 +1,7 @@
-use common::io::collect_stdin;
+use common::io::stdin::collect_into_vec;
 
 fn main() {
-    let values = collect_stdin::<i64>();
+    let values = collect_into_vec::<i64>();
 
     // Part 1
     let count_part_1 = values

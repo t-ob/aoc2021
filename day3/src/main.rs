@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use common::io::collect_stdin_with;
+use common::io::stdin::collect_into_vec_with;
 
 fn bit_weight(bit_position: usize, values: &[u16]) -> u16 {
     let mut ones = 0;
@@ -18,7 +18,7 @@ fn bit_weight(bit_position: usize, values: &[u16]) -> u16 {
 }
 
 fn main() {
-    let values = collect_stdin_with(|s| u16::from_str_radix(s.trim(), 2).ok());
+    let values = collect_into_vec_with(|s| u16::from_str_radix(s.trim(), 2).ok());
 
     let next_power_of_two_bit_position = values
         .iter()
