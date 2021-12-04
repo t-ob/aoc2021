@@ -9,8 +9,9 @@ const BOARD_SIZE: usize = 5;
 
 #[derive(Clone)]
 struct Board {
-    row_marks: [usize; BOARD_SIZE],
-    col_marks: [usize; BOARD_SIZE],
+    row_mark_count: [usize; BOARD_SIZE],
+    col_mark_count: [usize; BOARD_SIZE],
+    total: u16,
     marked_total: u16,
     values: HashMap<u16, (usize, usize)>,
 }
@@ -19,11 +20,11 @@ impl Board {
     pub fn mark(&mut self, value: u16) -> Option<u32> {
         if let Some((row, col)) = self.values.get(&value) {
             self.marked_total += value;
-            self.row_marks[*row] += 1;
-            self.col_marks[*col] += 1;
+            self.row_mark_count[*row] += 1;
+            self.col_mark_count[*col] += 1;
 
-            if self.row_marks[*row] == BOARD_SIZE || self.col_marks[*col] == BOARD_SIZE {
-                return Some(value as u32 * (self.values.keys().sum::<u16>() - self.marked_total) as u32);
+            if self.row_mark_count[*row] == BOARD_SIZE || self.col_mark_count[*col] == BOARD_SIZE {
+                return Some(value as u32 * (self.total - self.marked_total) as u32);
             }
         }
         None
@@ -34,13 +35,15 @@ impl FromStr for Board {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let row_marks = [0; BOARD_SIZE];
-        let col_marks = [0; BOARD_SIZE];
+        let row_mark_count = [0; BOARD_SIZE];
+        let col_mark_count = [0; BOARD_SIZE];
+        let mut total = 0;
         let marked_total = 0;
         let mut values = HashMap::new();
         for (row, line) in s.lines().enumerate() {
             for (col, s) in line.split_ascii_whitespace().enumerate() {
                 if let Ok(value) = s.parse::<u16>() {
+                    total += value;
                     values.insert(value, (row, col));
                 } else {
                     return Err(());
@@ -49,8 +52,9 @@ impl FromStr for Board {
         }
 
         Ok(Board {
-            row_marks,
-            col_marks,
+            row_mark_count,
+            col_mark_count,
+            total,
             marked_total,
             values,
         })
