@@ -74,7 +74,7 @@ fn main() {
         let mut boards_part_1 = boards.clone();
         let mut first_found = false;
         for number in &numbers {
-            if first_found == true {
+            if first_found {
                 break;
             }
             for board in boards_part_1.iter_mut() {
@@ -87,7 +87,7 @@ fn main() {
         }
 
         // Part 2
-        let mut boards_part_2 = boards.clone();
+        let mut boards_part_2 = boards;
         let mut winning_boards = HashSet::new();
         let mut last_winning_score = None;
         for number in &numbers {

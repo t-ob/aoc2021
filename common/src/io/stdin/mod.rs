@@ -26,7 +26,7 @@ pub fn read_line_with<T>(f: fn(&str) -> Option<T>) -> Option<T> {
     let stdin = std::io::stdin();
     let mut buf = String::new();
 
-    if let Ok(_) = stdin.read_line(&mut buf) {
+    if stdin.read_line(&mut buf).is_ok() {
         return f(&buf);
     }
 
@@ -38,7 +38,7 @@ pub fn collect_lines_into_vec<T: FromStr>(delimiter: &str) -> Vec<T> {
     let mut buf = String::new();
 
     let mut result = Vec::new();
-    if let Ok(_) = stdin.read_to_string(&mut buf) {
+    if stdin.read_to_string(&mut buf).is_ok() {
         result.extend(
             buf.trim()
                 .split(delimiter)

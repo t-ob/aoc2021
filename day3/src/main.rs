@@ -39,7 +39,7 @@ fn main() {
 
     // Part 2
     let mut oxygen_generator_values = VecDeque::from(values.clone());
-    let mut co2_scrubber_values = VecDeque::from(values.clone());
+    let mut co2_scrubber_values = VecDeque::from(values);
 
     for (diagnostic_values, y) in [
         (&mut oxygen_generator_values, 0),

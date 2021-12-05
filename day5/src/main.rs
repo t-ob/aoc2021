@@ -29,10 +29,10 @@ fn main() {
             let count_part_1 = sea_bed_part_1[idx];
             sea_bed_part_1[idx] = 3
                 & (count_part_1
-                    | count_part_1 + (1 & (normalised_direction.x + normalised_direction.y)));
+                    | (count_part_1 + (1 & (normalised_direction.x + normalised_direction.y))));
 
             let count_part_2 = sea_bed_part_2[idx];
-            sea_bed_part_2[idx] = 3 & (count_part_2 | count_part_2 + 1);
+            sea_bed_part_2[idx] = 3 & (count_part_2 | (count_part_2 + 1));
 
             p += normalised_direction;
         }
