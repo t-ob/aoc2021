@@ -26,7 +26,7 @@ fn main() {
             .collect::<Option<Vec<_>>>();
         tokens
     }) {
-        let mut counts: [usize; 9] = [0; 9];
+        let mut counts = [0; 9];
         for days_remaining in initial_state {
             counts[days_remaining] += 1;
         }
