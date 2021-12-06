@@ -12,6 +12,11 @@ fn main() {
             .collect::<Option<Vec<_>>>();
         tokens
     }) {
+        let mut counts: [usize; 9] = [0; 9];
+        for days_remaining in initial_state {
+            counts[days_remaining] += 1;
+        }
+
         let mut dp = [1; 9];
 
         let mut day = 0;
@@ -28,7 +33,10 @@ fn main() {
             if day == PART_1_DAYS || day == PART_2_DAYS {
                 println!(
                     "{}",
-                    initial_state.iter().map(|idx| dp[*idx]).sum::<usize>()
+                    counts
+                        .iter()
+                        .zip(dp.iter())
+                        .fold(0, |acc, (count, descendents)| acc + count * descendents)
                 );
             }
         }
