@@ -17,6 +17,12 @@ fn advance(iterations: usize, data: &mut [usize; 9]) {
     }
 }
 
+fn scalar_product(lhs: &[usize; 9], rhs: &[usize; 9]) -> usize {
+    lhs.iter()
+        .zip(rhs.iter())
+        .fold(0, |acc, (s, t)| acc + s * t)
+}
+
 fn main() {
     if let Some(initial_state) = read_line_with(|line| {
         let tokens = line
@@ -34,21 +40,9 @@ fn main() {
         let mut dp = [1; 9];
 
         advance(PART_1_DAYS, &mut dp);
-        println!(
-            "{}",
-            counts
-                .iter()
-                .zip(dp.iter())
-                .fold(0, |acc, (count, descendents)| acc + count * descendents)
-        );
+        println!("{}", scalar_product(&counts, &dp));
 
         advance(PART_2_DAYS - PART_1_DAYS, &mut dp);
-        println!(
-            "{}",
-            counts
-                .iter()
-                .zip(dp.iter())
-                .fold(0, |acc, (count, descendents)| acc + count * descendents)
-        );
+        println!("{}", scalar_product(&counts, &dp));
     }
 }
