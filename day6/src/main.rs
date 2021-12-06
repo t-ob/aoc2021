@@ -12,18 +12,16 @@ fn main() {
             .collect::<Option<Vec<_>>>();
         tokens
     }) {
-        let mut dp = [1; 18];
+        let mut dp = [1; 9];
 
         let mut day = 0;
 
         while day < PART_2_DAYS {
-            dp[0] = dp[15] + dp[17];
-            for i in 1..9 {
-                dp[i] = dp[i + 8];
+            let next_zero = dp[6] + dp[8];
+            for i in (1..9).rev() {
+                dp[i] = dp[i - 1];
             }
-            for i in 9..18 {
-                dp[i] = dp[i - 9];
-            }
+            dp[0] = next_zero;
 
             day += 1;
 
