@@ -3,6 +3,20 @@ use common::io::stdin::read_line_with;
 static PART_1_DAYS: usize = 80;
 static PART_2_DAYS: usize = 256;
 
+fn advance(iterations: usize, data: &mut [usize; 9]) {
+    let mut iteration = 0;
+
+    while iteration < iterations {
+        let next_zero = data[6] + data[8];
+        for i in (1..9).rev() {
+            data[i] = data[i - 1];
+        }
+        data[0] = next_zero;
+
+        iteration += 1;
+    }
+}
+
 fn main() {
     if let Some(initial_state) = read_line_with(|line| {
         let tokens = line
@@ -19,26 +33,22 @@ fn main() {
 
         let mut dp = [1; 9];
 
-        let mut day = 0;
+        advance(PART_1_DAYS, &mut dp);
+        println!(
+            "{}",
+            counts
+                .iter()
+                .zip(dp.iter())
+                .fold(0, |acc, (count, descendents)| acc + count * descendents)
+        );
 
-        while day < PART_2_DAYS {
-            let next_zero = dp[6] + dp[8];
-            for i in (1..9).rev() {
-                dp[i] = dp[i - 1];
-            }
-            dp[0] = next_zero;
-
-            day += 1;
-
-            if day == PART_1_DAYS || day == PART_2_DAYS {
-                println!(
-                    "{}",
-                    counts
-                        .iter()
-                        .zip(dp.iter())
-                        .fold(0, |acc, (count, descendents)| acc + count * descendents)
-                );
-            }
-        }
+        advance(PART_2_DAYS - PART_1_DAYS, &mut dp);
+        println!(
+            "{}",
+            counts
+                .iter()
+                .zip(dp.iter())
+                .fold(0, |acc, (count, descendents)| acc + count * descendents)
+        );
     }
 }
