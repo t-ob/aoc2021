@@ -62,41 +62,43 @@ impl FromStr for Board {
 }
 
 fn main() {
-    if let Some(numbers) = stdin::read_csv_line::<u16>() {
-        let boards = stdin::collect_lines_into_vec::<Board>("\n\n");
+    let numbers = match stdin::read_csv_line::<u16>() {
+        Some(numbers) => numbers,
+        _ => return,
+    };
+    let boards = stdin::collect_lines_into_vec::<Board>("\n\n");
 
-        // Part 1
-        let mut boards_part_1 = boards.clone();
-        let mut first_found = false;
-        for number in &numbers {
-            if first_found {
+    // Part 1
+    let mut boards_part_1 = boards.clone();
+    let mut first_found = false;
+    for number in &numbers {
+        if first_found {
+            break;
+        }
+        for board in boards_part_1.iter_mut() {
+            if let Some(score) = board.mark(*number) {
+                println!("{}", score);
+                first_found = true;
                 break;
             }
-            for board in boards_part_1.iter_mut() {
-                if let Some(score) = board.mark(*number) {
-                    println!("{}", score);
-                    first_found = true;
-                    break;
-                }
-            }
         }
-
-        // Part 2
-        let mut boards_part_2 = boards;
-        let mut winning_boards = HashSet::new();
-        let mut last_winning_score = None;
-        for number in &numbers {
-            for (idx, board) in boards_part_2.iter_mut().enumerate() {
-                if winning_boards.contains(&idx) {
-                    continue;
-                }
-                if let Some(score) = board.mark(*number) {
-                    winning_boards.insert(idx);
-                    last_winning_score = Some(score);
-                }
-            }
-        }
-
-        println!("{}", last_winning_score.unwrap());
     }
+
+    // Part 2
+    let mut boards_part_2 = boards;
+    let mut winning_boards = HashSet::new();
+    let mut last_winning_score = None;
+    for number in &numbers {
+        for (idx, board) in boards_part_2.iter_mut().enumerate() {
+            if winning_boards.contains(&idx) {
+                continue;
+            }
+            if let Some(score) = board.mark(*number) {
+                winning_boards.insert(idx);
+                last_winning_score = Some(score);
+            }
+        }
+    }
+
+    println!("{}", last_winning_score.unwrap());
 }

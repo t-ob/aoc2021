@@ -13,26 +13,29 @@ fn advance(data: &mut [usize; 9]) {
 }
 
 fn main() {
-    if let Some(initial_state) = stdin::read_csv_line::<usize>() {
-        let mut counts = [0; 9];
-        for days_remaining in initial_state {
-            counts[days_remaining] += 1;
-        }
+    let initial_state = match stdin::read_csv_line::<usize>() {
+        Some(initial_state) => initial_state,
+        _ => return,
+    };
 
-        let mut dp = [1; 9];
-
-        let mut iteration = 0;
-
-        while iteration < PART_1_DAYS {
-            advance( &mut dp);
-            iteration += 1;
-        }
-        println!("{}", linalg::scalar_product(&counts, &dp));
-
-        while iteration < PART_2_DAYS {
-            advance(&mut dp);
-            iteration += 1;
-        }
-        println!("{}", linalg::scalar_product(&counts, &dp));
+    let mut counts = [0; 9];
+    for days_remaining in initial_state {
+        counts[days_remaining] += 1;
     }
+
+    let mut dp = [1; 9];
+
+    let mut iteration = 0;
+
+    while iteration < PART_1_DAYS {
+        advance( &mut dp);
+        iteration += 1;
+    }
+    println!("{}", linalg::scalar_product(&counts, &dp));
+
+    while iteration < PART_2_DAYS {
+        advance(&mut dp);
+        iteration += 1;
+    }
+    println!("{}", linalg::scalar_product(&counts, &dp));
 }
