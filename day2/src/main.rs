@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use common::io::stdin::collect_into_vec;
+use common::io::stdin;
 
 enum Command {
     Up(u64),
@@ -25,7 +25,7 @@ impl FromStr for Command {
 }
 
 fn main() {
-    let commands = collect_into_vec::<Command>();
+    let commands = stdin::collect_into_vec::<Command>();
 
     let mut aim = 0;
     let mut depth = 0;

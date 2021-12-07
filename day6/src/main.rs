@@ -1,5 +1,5 @@
 use common::math::linalg;
-use common::io::stdin::read_csv_line;
+use common::io::stdin;
 
 static PART_1_DAYS: usize = 80;
 static PART_2_DAYS: usize = 256;
@@ -13,7 +13,7 @@ fn advance(data: &mut [usize; 9]) {
 }
 
 fn main() {
-    if let Some(initial_state) = read_csv_line::<usize>() {
+    if let Some(initial_state) = stdin::read_csv_line::<usize>() {
         let mut counts = [0; 9];
         for days_remaining in initial_state {
             counts[days_remaining] += 1;

@@ -1,9 +1,9 @@
-use common::io::stdin::read_csv_line;
+use common::io::stdin;
 
 const POSITIONS: usize = 1 << 11;
 
 fn main() {
-    if let Some(positions) = read_csv_line::<u16>() {
+    if let Some(positions) = stdin::read_csv_line::<u16>() {
         let mut fuel_costs_part_1: [u32; POSITIONS] = [0; POSITIONS];
         let mut fuel_costs_part_2: [u32; POSITIONS] = [0; POSITIONS];
     
