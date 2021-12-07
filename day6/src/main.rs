@@ -1,3 +1,4 @@
+use common::geometry;
 use common::io::stdin::read_csv_line;
 
 static PART_1_DAYS: usize = 80;
@@ -9,12 +10,6 @@ fn advance(data: &mut [usize; 9]) {
         data[i] = data[i - 1];
     }
     data[0] = next_zero;
-}
-
-fn scalar_product(lhs: &[usize; 9], rhs: &[usize; 9]) -> usize {
-    lhs.iter()
-        .zip(rhs.iter())
-        .fold(0, |acc, (s, t)| acc + s * t)
 }
 
 fn main() {
@@ -32,12 +27,12 @@ fn main() {
             advance( &mut dp);
             iteration += 1;
         }
-        println!("{}", scalar_product(&counts, &dp));
+        println!("{}", geometry::scalar_product(&counts, &dp));
 
         while iteration < PART_2_DAYS {
             advance(&mut dp);
             iteration += 1;
         }
-        println!("{}", scalar_product(&counts, &dp));
+        println!("{}", geometry::scalar_product(&counts, &dp));
     }
 }

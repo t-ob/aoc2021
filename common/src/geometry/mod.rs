@@ -1,6 +1,6 @@
 use std::{
     ops::{Add, AddAssign, Div, Mul, Sub},
-    str::FromStr,
+    str::FromStr, iter::Sum,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -84,4 +84,11 @@ impl<T: Copy + Div<Output = T>> Div<Scalar<T>> for Point<T> {
 
         Point { x, y }
     }
+}
+
+pub fn scalar_product<T: Copy + Sum + Mul<Output = T>>(lhs: &[T], rhs: &[T]) -> T {
+    lhs.iter()
+        .zip(rhs.iter())
+        .map(|(s, t)| *s * *t)
+        .sum::<T>()
 }
