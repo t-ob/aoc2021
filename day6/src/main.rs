@@ -1,4 +1,4 @@
-use common::io::stdin::read_line_with;
+use common::io::stdin::read_csv_line;
 
 static PART_1_DAYS: usize = 80;
 static PART_2_DAYS: usize = 256;
@@ -18,14 +18,7 @@ fn scalar_product(lhs: &[usize; 9], rhs: &[usize; 9]) -> usize {
 }
 
 fn main() {
-    if let Some(initial_state) = read_line_with(|line| {
-        let tokens = line
-            .trim()
-            .split(',')
-            .map(|t| t.parse::<usize>().ok())
-            .collect::<Option<Vec<_>>>();
-        tokens
-    }) {
+    if let Some(initial_state) = read_csv_line::<usize>() {
         let mut counts = [0; 9];
         for days_remaining in initial_state {
             counts[days_remaining] += 1;

@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-use common::io::stdin::{collect_lines_into_vec, read_line_with};
+use common::io::stdin::{collect_lines_into_vec, read_csv_line};
 
 const BOARD_SIZE: usize = 5;
 
@@ -62,12 +62,7 @@ impl FromStr for Board {
 }
 
 fn main() {
-    if let Some(numbers) = read_line_with(|line| {
-        line.trim()
-            .split(',')
-            .map(|s| s.parse::<u16>().ok())
-            .collect::<Option<Vec<_>>>()
-    }) {
+    if let Some(numbers) = read_csv_line::<u16>() {
         let boards = collect_lines_into_vec::<Board>("\n\n");
 
         // Part 1
