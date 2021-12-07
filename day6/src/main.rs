@@ -1,4 +1,4 @@
-use common::geometry;
+use common::math::linalg;
 use common::io::stdin::read_csv_line;
 
 static PART_1_DAYS: usize = 80;
@@ -27,12 +27,12 @@ fn main() {
             advance( &mut dp);
             iteration += 1;
         }
-        println!("{}", geometry::scalar_product(&counts, &dp));
+        println!("{}", linalg::scalar_product(&counts, &dp));
 
         while iteration < PART_2_DAYS {
             advance(&mut dp);
             iteration += 1;
         }
-        println!("{}", geometry::scalar_product(&counts, &dp));
+        println!("{}", linalg::scalar_product(&counts, &dp));
     }
 }

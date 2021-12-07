@@ -1,11 +1,11 @@
 use std::cmp::max;
 
-use common::geometry::{Point, Scalar};
+use common::math::linalg::{Vec2D, Scalar};
 use common::io::stdin::collect_into_vec_with;
 
 fn main() {
     let line_segments = collect_into_vec_with(|line| {
-        let mut points = line.split(" -> ").map(|token| token.parse::<Point<i32>>());
+        let mut points = line.split(" -> ").map(|token| token.parse::<Vec2D<i32>>());
         match (points.next(), points.next()) {
             (Some(Ok(p)), Some(Ok(q))) => Some((p, q)),
             _ => None,

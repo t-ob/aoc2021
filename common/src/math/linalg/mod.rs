@@ -4,7 +4,7 @@ use std::{
 };
 
 #[derive(Debug, Clone, Copy)]
-pub struct Point<T> {
+pub struct Vec2D<T> {
     pub x: T,
     pub y: T,
 }
@@ -20,7 +20,7 @@ impl<T> Scalar<T> {
     }
 }
 
-impl<T: FromStr> FromStr for Point<T> {
+impl<T: FromStr> FromStr for Vec2D<T> {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -31,58 +31,58 @@ impl<T: FromStr> FromStr for Point<T> {
             _ => return Err(()),
         };
 
-        Ok(Point { x, y })
+        Ok(Vec2D { x, y })
     }
 }
 
-impl<T: Add<Output = T>> Add for Point<T> {
-    type Output = Point<T>;
+impl<T: Add<Output = T>> Add for Vec2D<T> {
+    type Output = Vec2D<T>;
 
     fn add(self, rhs: Self) -> Self::Output {
         let x = self.x + rhs.x;
         let y = self.y + rhs.y;
 
-        Point { x, y }
+        Vec2D { x, y }
     }
 }
 
-impl<T: AddAssign> AddAssign for Point<T> {
+impl<T: AddAssign> AddAssign for Vec2D<T> {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
     }
 }
 
-impl<T: Sub<Output = T>> Sub for Point<T> {
-    type Output = Point<T>;
+impl<T: Sub<Output = T>> Sub for Vec2D<T> {
+    type Output = Vec2D<T>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         let x = self.x - rhs.x;
         let y = self.y - rhs.y;
 
-        Point { x, y }
+        Vec2D { x, y }
     }
 }
 
-impl<T: Copy + Mul<Output = T>> Mul<Point<T>> for Scalar<T> {
-    type Output = Point<T>;
+impl<T: Copy + Mul<Output = T>> Mul<Vec2D<T>> for Scalar<T> {
+    type Output = Vec2D<T>;
 
-    fn mul(self, rhs: Point<T>) -> Self::Output {
+    fn mul(self, rhs: Vec2D<T>) -> Self::Output {
         let x = self.v * rhs.x;
         let y = self.v * rhs.y;
 
-        Point { x, y }
+        Vec2D { x, y }
     }
 }
 
-impl<T: Copy + Div<Output = T>> Div<Scalar<T>> for Point<T> {
-    type Output = Point<T>;
+impl<T: Copy + Div<Output = T>> Div<Scalar<T>> for Vec2D<T> {
+    type Output = Vec2D<T>;
 
     fn div(self, rhs: Scalar<T>) -> Self::Output {
         let x = self.x / rhs.v;
         let y = self.y / rhs.v;
 
-        Point { x, y }
+        Vec2D { x, y }
     }
 }
 
