@@ -1,12 +1,14 @@
 use common::io::stdin::read_csv_line;
 
+const POSITIONS: usize = 1 << 11;
+
 fn main() {
     if let Some(positions) = read_csv_line::<u16>() {
-        let mut fuel_costs_part_1: [u32; 1 << 11] = [0; 1 << 11];
-        let mut fuel_costs_part_2: [u32; 1 << 11] = [0; 1 << 11];
+        let mut fuel_costs_part_1: [u32; POSITIONS] = [0; POSITIONS];
+        let mut fuel_costs_part_2: [u32; POSITIONS] = [0; POSITIONS];
     
         for initial_position in positions {
-            for destination in 0..(1 << 11) {
+            for destination in 0..POSITIONS {
                 let distance = (initial_position as i16 - destination as i16).abs() as u32;
                 fuel_costs_part_1[destination] += distance;
                 fuel_costs_part_2[destination] += (distance * (distance + 1)) / 2;
