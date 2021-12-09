@@ -21,35 +21,14 @@ impl HeightMap {
         self.heights[row][col]
     }
 
-    fn neighbour_indices(&self, idx: (usize, usize)) -> [Option<(usize, usize)>; 4] {
-        match idx {
-            (0, 0) => [Some((0, 1)), None, None, Some((1, 0))],
-            (0, col) if col == self.cols - 1 => [None, None, Some((0, col - 1)), Some((1, col))],
-            (0, col) => [Some((0, col + 1)), None, Some((0, col - 1)), Some((1, col))],
-            (row, 0) if row == self.rows - 1 => [Some((row, 1)), Some((row - 1, 0)), None, None],
-            (row, col) if row == self.rows - 1 && col == self.cols - 1 => {
-                [None, Some((row - 1, col)), Some((row, col - 1)), None]
-            }
-            (row, col) if row == self.rows - 1 => [
-                Some((row, col + 1)),
-                Some((row - 1, col)),
-                Some((row, col - 1)),
-                None,
-            ],
-            (row, 0) => [Some((row, 1)), Some((row - 1, 0)), None, Some((row + 1, 0))],
-            (row, col) if col == self.cols - 1 => [
-                None,
-                Some((row - 1, col)),
-                Some((row, col - 1)),
-                Some((row + 1, col)),
-            ],
-            (row, col) => [
-                Some((row, col + 1)),
-                Some((row - 1, col)),
-                Some((row, col - 1)),
-                Some((row + 1, col)),
-            ],
-        }
+    fn neighbour_indices(&self, idx: (usize, usize)) -> [(usize, usize); 4] {
+        let (row, col) = idx;
+        [
+            (row, col + 1),
+            (row - 1, col),
+            (row, col - 1),
+            (row + 1, col),
+        ]
     }
 }
 
@@ -69,7 +48,7 @@ impl FromStr for HeightMap {
                 if !c.is_numeric() {
                     return Err(());
                 }
-                heights[y][x] = c as u8 - b'0';
+                heights[y + 1][x + 1] = c as u8 - b'0';
             }
         }
 
@@ -90,15 +69,15 @@ fn main() {
     let mut min_heights = Vec::new();
 
     // Part 1
-    for row in 0..height_map.rows {
-        for col in 0..height_map.cols {
+    for row in 1..(height_map.rows + 1) {
+        for col in 1..(height_map.cols + 1) {
             let idx = (row, col);
             let height = height_map.get(idx);
             let neighbour_indices = height_map.neighbour_indices(idx);
 
             let min_neighbouring_height = neighbour_indices
                 .iter()
-                .filter_map(|x| x.map(|idx| height_map.get(idx)))
+                .map(|idx| height_map.get(*idx))
                 .min()
                 .unwrap();
 
@@ -108,7 +87,13 @@ fn main() {
         }
     }
 
-    println!("{}", min_heights.iter().map(|idx| 1 + height_map.get(*idx) as u16).sum::<u16>());
+    println!(
+        "{}",
+        min_heights
+            .iter()
+            .map(|idx| 1 + height_map.get(*idx) as u16)
+            .sum::<u16>()
+    );
 
     // Part 2
     let mut component_sizes = BinaryHeap::new();
@@ -126,13 +111,13 @@ fn main() {
             seen.insert(next_idx);
             component_size += 1;
 
-            for neighbour_index in height_map.neighbour_indices(next_idx).into_iter().flatten() {
-                if seen.contains(&neighbour_index) || height_map.get(neighbour_index) == MAX_HEIGHT {
+            for neighbour_index in height_map.neighbour_indices(next_idx) {
+                if seen.contains(&neighbour_index) || height_map.get(neighbour_index) == MAX_HEIGHT
+                {
                     continue;
                 }
-                queue.push_back(neighbour_index); 
+                queue.push_back(neighbour_index);
             }
-
         }
         component_sizes.push(component_size);
     }
