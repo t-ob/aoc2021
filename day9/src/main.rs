@@ -127,15 +127,13 @@ fn main() {
     let mut seen = HashSet::new();
 
     let mut queue = VecDeque::new();
-    while !remaining.is_empty() {
+    while let Some(next_remaining) = remaining.pop() {
         let mut component_size = 0;
-        let next_remaining = remaining.pop().unwrap();
         if seen.contains(&next_remaining) {
             continue;
         }
         queue.push_back(next_remaining);
-        while !queue.is_empty() {
-            let next_idx = queue.pop_front().unwrap();
+        while let Some(next_idx) = queue.pop_front() {
             if seen.contains(&next_idx) {
                 continue;
             }
