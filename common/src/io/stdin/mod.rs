@@ -3,6 +3,17 @@ use std::{
     str::FromStr,
 };
 
+pub fn read<T: FromStr>() -> Option<T> {
+    let mut stdin = std::io::stdin();
+    let mut buf = String::new();
+
+    if stdin.read_to_string(&mut buf).is_ok() {
+        return buf.parse().ok()
+    }
+
+    None
+}
+
 pub fn collect_into_vec<T: FromStr>() -> Vec<T> {
     let stdin = std::io::stdin();
     stdin
