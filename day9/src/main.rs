@@ -87,9 +87,9 @@ fn main() {
         _ => return,
     };
 
-    // Part 1
-    let mut risk_level: u16 = 0;
+    let mut min_heights = Vec::new();
 
+    // Part 1
     for row in 0..height_map.rows {
         for col in 0..height_map.cols {
             let idx = (row, col);
@@ -103,35 +103,21 @@ fn main() {
                 .unwrap();
 
             if height < min_neighbouring_height {
-                risk_level += 1 + height as u16;
+                min_heights.push(idx);
             }
         }
     }
 
-    println!("{}", risk_level);
+    println!("{}", min_heights.iter().map(|idx| 1 + height_map.get(*idx) as u16).sum::<u16>());
 
     // Part 2
-    let mut remaining = Vec::new();
-    for row in 0..height_map.rows {
-        for col in 0..height_map.cols {
-            let idx = (row, col);
-            if height_map.get(idx) == MAX_HEIGHT {
-                continue;
-            }
-            remaining.push(idx);
-        }
-    }
-
     let mut component_sizes = BinaryHeap::new();
 
     let mut seen = HashSet::new();
 
     let mut queue = VecDeque::new();
-    while let Some(next_remaining) = remaining.pop() {
+    while let Some(next_remaining) = min_heights.pop() {
         let mut component_size = 0;
-        if seen.contains(&next_remaining) {
-            continue;
-        }
         queue.push_back(next_remaining);
         while let Some(next_idx) = queue.pop_front() {
             if seen.contains(&next_idx) {
