@@ -3,7 +3,6 @@ use std::collections::BinaryHeap;
 use common::io::stdin;
 
 const OPENERS: [char; 4] = ['(', '[', '{', '<'];
-const CLOSERS: [char; 4] = [')', ']', '}', '>'];
 
 fn main() {
     let lines = stdin::collect_into_vec_with(|line| Some(line.trim().chars().collect::<Vec<_>>()));
@@ -29,19 +28,16 @@ fn main() {
             if corrupted {
                 break;
             }
-            if OPENERS.contains(&char) {
-                stack.push(char);
-                continue;
-            }
-            if CLOSERS.contains(&char) {
-                match (stack.last(), char) {
-                    (Some('('), ')') | (Some('['), ']') | (Some('{'), '}') | (Some('<'), '>') => {
-                        stack.pop();
-                    }
-                    (_, c) => {
-                        corrupted = true;
-                        syntax_error_score += syntax_error_score_map[c as usize];
-                    }
+            match (stack.last(), char) {
+                (Some('('), ')') | (Some('['), ']') | (Some('{'), '}') | (Some('<'), '>') => {
+                    stack.pop();
+                }
+                (_, c) if OPENERS.contains(&c) => {
+                    stack.push(c);
+                }
+                (_, c) => {
+                    corrupted = true;
+                    syntax_error_score += syntax_error_score_map[c as usize];
                 }
             }
         }
