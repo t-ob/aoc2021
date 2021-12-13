@@ -8,12 +8,37 @@ type Vertex = String;
 type Graph = HashMap<Vertex, Vec<Vertex>>;
 type Path = Vec<Vertex>;
 
-fn construct_candidates(path: &Path, graph: &Graph) -> Vec<Vertex> {
-    let mut in_sol = HashSet::new(); // [false; 1 << 8];
-    for s in path {
-        if !(*s == s.to_uppercase()) {
-            in_sol.insert(s);
+enum Policy {
+    Part1,
+    Part2,
+}
+
+fn construct_candidates(path: &Path, graph: &Graph, policy: Policy) -> Vec<Vertex> {
+    let mut invalid_candidates = HashSet::new(); // [false; 1 << 8];
+    match policy {
+        Policy::Part1 => {
+            let lowercase_vertices = path.iter().filter(|vertex| **vertex == vertex.to_lowercase());
+            for vertex in lowercase_vertices {
+                invalid_candidates.insert(vertex.clone());
+            }
+        },
+        Policy::Part2 => {
+            invalid_candidates.insert("start".to_string());
+            let lowercase_vertices = path.iter().filter(|vertex| **vertex == vertex.to_lowercase() && **vertex != "start");
+            let mut counts = HashMap::new();
+            let mut small_visited_twice = false;
+            for vertex in lowercase_vertices {
+                let e = counts.entry(vertex).or_insert(0);
+                *e += 1;
+                small_visited_twice |= *e == 2;
+            }
+            if small_visited_twice {
+                for vertex in counts.keys() {
+                    invalid_candidates.insert(vertex.to_string());
+                }
+            }
         }
+
     }
 
     if path.is_empty() {
@@ -27,7 +52,7 @@ fn construct_candidates(path: &Path, graph: &Graph) -> Vec<Vertex> {
         }
         if let Some(ns) = graph.get(last) {
             for v in ns {
-                if !in_sol.contains(v) {
+                if !invalid_candidates.contains(v) {
                     candidates.push(v.clone());
                 }
             }
@@ -41,7 +66,7 @@ fn backtrack(path: &mut Path, graph: &Graph, solution_count: &mut usize) {
         *solution_count += 1;
         return;
     }
-    let candidates = construct_candidates(path, graph);
+    let candidates = construct_candidates(path, graph, Policy::Part2);
 
     for candidate in candidates {
         path.push(candidate);
