@@ -4,30 +4,35 @@ use common::io::stdin;
 
 type Vertex = String;
 type Graph = HashMap<Vertex, Vec<Vertex>>;
-type Path = Vec<Option<Vertex>>;
+type Path = Vec<Vertex>;
 
-fn construct_candidates(path: &Path, k: usize, graph: &Graph, candidates: &mut Vec<Option<Vertex>>, nc: &mut usize) {
+fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Option<Vertex>>, nc: &mut usize) {
     let mut in_sol = HashSet::new(); // [false; 1 << 8];
-    for i in 0..k {
-        if let Some(s) = path[i].clone() {
-            if !(s == s.to_uppercase()) {
-                in_sol.insert(s);
-            }
+    // for i in 0..k {
+    //     if let Some(s) = path[i].clone() {
+    //         if !(s == s.to_uppercase()) {
+    //             in_sol.insert(s);
+    //         }
+    //     }
+    // }
+    for s in path {
+        if !(*s == s.to_uppercase()) {
+            in_sol.insert(s);
         }
     }
 
-    if k == 1 {
+    if path.is_empty() {
         candidates[0] = Some("start".to_string());
         *nc = 1;
         return;
     }
 
     *nc = 0;
-    if let Some(last) = path[k-1].clone() {
-        if last == "end".to_string() {
+    if let Some(last) = path.last() {
+        if *last == "end".to_string() {
             return
         }
-        if let Some(ns) = graph.get(&last) {
+        if let Some(ns) = graph.get(last) {
             for v in ns {
                 if !in_sol.contains(v) {
                     candidates[*nc] = Some(v.clone());
@@ -38,18 +43,19 @@ fn construct_candidates(path: &Path, k: usize, graph: &Graph, candidates: &mut V
     }
 }
 
-fn backtrack(path: &mut Path, k: usize, graph: &Graph, solution_count: &mut usize) {
+fn backtrack(path: &mut Path, graph: &Graph, solution_count: &mut usize) {
     let mut candidates = vec![None; 1 << 8];
     let mut nc = 0;
-    if path[k-1] == Some("end".to_string()) {
+    if path.last() == Some(&"end".to_string()) {
         *solution_count += 1;
         return;
     }
-    construct_candidates(path, k, graph, &mut candidates, &mut nc);
+    construct_candidates(path, graph, &mut candidates, &mut nc);
 
     for i in 0..nc {
-        path[k] = candidates[i].clone();
-        backtrack(path, k + 1, graph, solution_count);
+        path.push(candidates[i].clone().unwrap());
+        backtrack(path,  graph, solution_count);
+        path.pop();
     }
 }
 
@@ -69,10 +75,10 @@ fn main() {
         neighbours_v.push(u.clone());
     }
 
-    let mut path = vec![None; 1 << 8];
+    let mut path = vec![];
     let mut solution_count = 0;
 
-    backtrack(&mut path, 1, &graph, &mut solution_count);
+    backtrack(&mut path,  &graph, &mut solution_count);
     
     println!("{}", solution_count);
 }
