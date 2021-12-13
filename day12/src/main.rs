@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use common::io::stdin;
 
-type Vertex = String;
+type Vertex = u8;
 type Graph = HashMap<Vertex, Vec<Vertex>>;
 type Path = Vec<Vertex>;
 
@@ -11,44 +11,46 @@ enum Policy {
     Part2,
 }
 
-fn construct_candidates(path: &Path, graph: &Graph, policy: Policy) -> Vec<Vertex> {
-    let mut invalid_candidates = HashSet::new(); // [false; 1 << 8];
+fn construct_candidates(
+    path: &Path,
+    graph: &Graph,
+    small_rooms: &HashSet<Vertex>,
+    start: &Vertex,
+    end: &Vertex,
+    policy: &Policy,
+) -> Vec<Vertex> {
+    if path.is_empty() {
+        return vec![*start];
+    }
+
+    let mut invalid_candidates = HashSet::new();
     match policy {
         Policy::Part1 => {
-            let lowercase_vertices = path
-                .iter()
-                .filter(|vertex| **vertex == vertex.to_lowercase());
-            for vertex in lowercase_vertices {
-                invalid_candidates.insert(vertex.clone());
+            for vertex in path.iter().filter(|v| small_rooms.contains(*v)) {
+                invalid_candidates.insert(vertex);
             }
         }
         Policy::Part2 => {
-            invalid_candidates.insert("start".to_string());
-            let lowercase_vertices = path
-                .iter()
-                .filter(|vertex| **vertex == vertex.to_lowercase() && **vertex != "start");
+            invalid_candidates.insert(start);
+            let small_rooms_visted = path.iter().filter(|v| small_rooms.contains(*v));
             let mut counts = HashMap::new();
             let mut small_visited_twice = false;
-            for vertex in lowercase_vertices {
-                let e = counts.entry(vertex).or_insert(0);
-                *e += 1;
-                small_visited_twice |= *e == 2;
+            for vertex in small_rooms_visted {
+                let count = counts.entry(vertex).or_insert(0);
+                *count += 1;
+                small_visited_twice |= *count == 2;
             }
             if small_visited_twice {
                 for vertex in counts.keys() {
-                    invalid_candidates.insert(vertex.to_string());
+                    invalid_candidates.insert(vertex);
                 }
             }
         }
     }
 
-    if path.is_empty() {
-        return vec!["start".to_string()];
-    }
-
     let mut candidates = vec![];
     if let Some(last) = path.last() {
-        if *last == "end".to_string() {
+        if last == end {
             return candidates;
         }
         if let Some(ns) = graph.get(last) {
@@ -62,16 +64,24 @@ fn construct_candidates(path: &Path, graph: &Graph, policy: Policy) -> Vec<Verte
     candidates
 }
 
-fn backtrack(path: &mut Path, graph: &Graph, solution_count: &mut usize) {
-    if path.last() == Some(&"end".to_string()) {
+fn backtrack(
+    graph: &Graph,
+    small_rooms: &HashSet<Vertex>,
+    start: &Vertex,
+    end: &Vertex,
+    policy: &Policy,
+    path: &mut Path,
+    solution_count: &mut usize,
+) {
+    if path.last() == Some(end) {
         *solution_count += 1;
         return;
     }
-    let candidates = construct_candidates(path, graph, Policy::Part2);
+    let candidates = construct_candidates(path, graph, small_rooms, start, end, policy);
 
     for candidate in candidates {
         path.push(candidate);
-        backtrack(path, graph, solution_count);
+        backtrack(graph, small_rooms, start, end, policy, path, solution_count);
         path.pop();
     }
 }
@@ -85,18 +95,64 @@ fn main() {
         }
     });
 
-    let mut graph = Graph::new();
-    for (u, v) in edges {
-        let neighbours_u = graph.entry(u.clone()).or_insert(Vec::new());
-        neighbours_u.push(v.clone());
-        let neighbours_v = graph.entry(v.clone()).or_insert(Vec::new());
-        neighbours_v.push(u.clone());
+    let mut rooms = HashSet::new();
+    for (u, v) in &edges {
+        rooms.insert(&u[..]);
+        rooms.insert(&v[..]);
     }
 
-    let mut path = vec![];
-    let mut solution_count = 0;
+    let room_map = rooms
+        .iter()
+        .enumerate()
+        .map(|(idx, room)| (*room, idx as u8))
+        .collect::<HashMap<_, _>>();
 
-    backtrack(&mut path, &graph, &mut solution_count);
+    let small_rooms = room_map
+        .iter()
+        .filter(|(k, v)| k.to_string() == k.to_lowercase())
+        .map(|(_, v)| *v)
+        .collect::<HashSet<_>>();
+    let start = room_map.get("start").unwrap();
+    let end = room_map.get("end").unwrap();
 
-    println!("{}", solution_count);
+    let mut graph = Graph::new();
+    for (u, v) in &edges {
+        let u = room_map.get(&u[..]).unwrap();
+        let v = room_map.get(&v[..]).unwrap();
+        let neighbours_u = graph.entry(*u).or_insert(Vec::new());
+        neighbours_u.push(*v);
+        let neighbours_v = graph.entry(*v).or_insert(Vec::new());
+        neighbours_v.push(*u);
+    }
+
+    let mut path_part_1 = vec![];
+    let mut path_count_part_1 = 0;
+
+    backtrack(
+        &graph,
+        &small_rooms,
+        start,
+        end,
+        &Policy::Part1,
+        &mut path_part_1,
+        &mut path_count_part_1,
+    );
+
+    println!("{}", path_count_part_1);
+
+    let mut path_part_2 = vec![];
+    let mut path_count_part_2 = 0;
+
+    backtrack(
+        &graph,
+        &small_rooms,
+        start,
+        end,
+        &Policy::Part2,
+        &mut path_part_2,
+        &mut path_count_part_2,
+    );
+    
+    println!("{}", path_count_part_2);
+
 }
