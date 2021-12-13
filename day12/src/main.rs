@@ -4,7 +4,6 @@ use common::io::stdin;
 
 type Vertex = u8;
 type Graph = HashMap<Vertex, Vec<Vertex>>;
-type Path = Vec<Vertex>;
 
 enum Policy {
     Part1,
@@ -12,7 +11,7 @@ enum Policy {
 }
 
 fn construct_candidates(
-    path: &Path,
+    path: &[Vertex],
     graph: &Graph,
     small_rooms: &HashSet<Vertex>,
     start: &Vertex,
@@ -56,7 +55,7 @@ fn construct_candidates(
         if let Some(ns) = graph.get(last) {
             for v in ns {
                 if !invalid_candidates.contains(v) {
-                    candidates.push(v.clone());
+                    candidates.push(*v);
                 }
             }
         }
@@ -70,7 +69,7 @@ fn backtrack(
     start: &Vertex,
     end: &Vertex,
     policy: &Policy,
-    path: &mut Path,
+    path: &mut Vec<Vertex>,
     solution_count: &mut usize,
 ) {
     if path.last() == Some(end) {
@@ -109,7 +108,7 @@ fn main() {
 
     let small_rooms = room_map
         .iter()
-        .filter(|(k, v)| k.to_string() == k.to_lowercase())
+        .filter(|(k, _)| k.to_string() == k.to_lowercase())
         .map(|(_, v)| *v)
         .collect::<HashSet<_>>();
     let start = room_map.get("start").unwrap();
@@ -119,9 +118,9 @@ fn main() {
     for (u, v) in &edges {
         let u = room_map.get(&u[..]).unwrap();
         let v = room_map.get(&v[..]).unwrap();
-        let neighbours_u = graph.entry(*u).or_insert(Vec::new());
+        let neighbours_u = graph.entry(*u).or_insert_with(Vec::new);
         neighbours_u.push(*v);
-        let neighbours_v = graph.entry(*v).or_insert(Vec::new());
+        let neighbours_v = graph.entry(*v).or_insert_with(Vec::new);
         neighbours_v.push(*u);
     }
 
