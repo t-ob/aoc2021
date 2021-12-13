@@ -1,6 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-};
+use std::collections::{HashMap, HashSet};
 
 use common::io::stdin;
 
@@ -17,14 +15,18 @@ fn construct_candidates(path: &Path, graph: &Graph, policy: Policy) -> Vec<Verte
     let mut invalid_candidates = HashSet::new(); // [false; 1 << 8];
     match policy {
         Policy::Part1 => {
-            let lowercase_vertices = path.iter().filter(|vertex| **vertex == vertex.to_lowercase());
+            let lowercase_vertices = path
+                .iter()
+                .filter(|vertex| **vertex == vertex.to_lowercase());
             for vertex in lowercase_vertices {
                 invalid_candidates.insert(vertex.clone());
             }
-        },
+        }
         Policy::Part2 => {
             invalid_candidates.insert("start".to_string());
-            let lowercase_vertices = path.iter().filter(|vertex| **vertex == vertex.to_lowercase() && **vertex != "start");
+            let lowercase_vertices = path
+                .iter()
+                .filter(|vertex| **vertex == vertex.to_lowercase() && **vertex != "start");
             let mut counts = HashMap::new();
             let mut small_visited_twice = false;
             for vertex in lowercase_vertices {
@@ -38,7 +40,6 @@ fn construct_candidates(path: &Path, graph: &Graph, policy: Policy) -> Vec<Verte
                 }
             }
         }
-
     }
 
     if path.is_empty() {
