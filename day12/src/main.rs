@@ -6,7 +6,7 @@ type Vertex = String;
 type Graph = HashMap<Vertex, Vec<Vertex>>;
 type Path = Vec<Vertex>;
 
-fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Option<Vertex>>, nc: &mut usize) {
+fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Vertex>, nc: &mut usize) {
     let mut in_sol = HashSet::new(); // [false; 1 << 8];
     // for i in 0..k {
     //     if let Some(s) = path[i].clone() {
@@ -22,7 +22,7 @@ fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Option<
     }
 
     if path.is_empty() {
-        candidates[0] = Some("start".to_string());
+        candidates.push("start".to_string());
         *nc = 1;
         return;
     }
@@ -35,7 +35,7 @@ fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Option<
         if let Some(ns) = graph.get(last) {
             for v in ns {
                 if !in_sol.contains(v) {
-                    candidates[*nc] = Some(v.clone());
+                    candidates.push(v.clone());
                     *nc += 1;
                 }
             }
@@ -44,7 +44,7 @@ fn construct_candidates(path: &Path, graph: &Graph, candidates: &mut Vec<Option<
 }
 
 fn backtrack(path: &mut Path, graph: &Graph, solution_count: &mut usize) {
-    let mut candidates = vec![None; 1 << 8];
+    let mut candidates = vec![];
     let mut nc = 0;
     if path.last() == Some(&"end".to_string()) {
         *solution_count += 1;
@@ -53,7 +53,7 @@ fn backtrack(path: &mut Path, graph: &Graph, solution_count: &mut usize) {
     construct_candidates(path, graph, &mut candidates, &mut nc);
 
     for i in 0..nc {
-        path.push(candidates[i].clone().unwrap());
+        path.push(candidates[i].clone());
         backtrack(path,  graph, solution_count);
         path.pop();
     }
