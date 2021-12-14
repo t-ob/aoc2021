@@ -13,50 +13,49 @@ enum Policy {
 fn construct_candidates(
     path: &[Vertex],
     graph: &Graph,
-    small_rooms: &HashSet<Vertex>,
+    small_rooms: &[u8; 1 << 8],
     start: &Vertex,
     end: &Vertex,
+    rooms_visited: &[usize; 1 << 8],
     policy: &Policy,
 ) -> Vec<Vertex> {
-    if path.is_empty() {
-        return vec![*start];
+    let last = match path.last() {
+        Some(last) => last,
+        _ => return vec![*start]
+    };
+
+    let mut invalid_candidates = [false; 1 << 8];
+
+    let mut small_rooms_visited: [usize; 1 << 8] = [0; 1 << 8];
+    for (small_room, (times_visited, room)) in small_rooms_visited.iter_mut().zip(rooms_visited.iter().zip(small_rooms.iter())) {
+        *small_room = *times_visited * *room as usize;
     }
 
-    let mut invalid_candidates = HashSet::new();
     match policy {
         Policy::Part1 => {
-            for vertex in path.iter().filter(|v| small_rooms.contains(*v)) {
-                invalid_candidates.insert(vertex);
+            for (room, times_visited) in (0usize..(1<<8)).zip(small_rooms_visited) {
+                invalid_candidates[room] = times_visited > 0;
             }
         }
         Policy::Part2 => {
-            invalid_candidates.insert(start);
-            let small_rooms_visted = path.iter().filter(|v| small_rooms.contains(*v));
-            let mut counts = HashMap::new();
-            let mut small_visited_twice = false;
-            for vertex in small_rooms_visted {
-                let count = counts.entry(vertex).or_insert(0);
-                *count += 1;
-                small_visited_twice |= *count == 2;
-            }
+            invalid_candidates[*start as usize] = true;
+            let small_visited_twice = small_rooms_visited.iter().any(|v| *v == 2);
             if small_visited_twice {
-                for vertex in counts.keys() {
-                    invalid_candidates.insert(vertex);
+                for (room, times_visited) in (0usize..(1<<8)).zip(small_rooms_visited) {
+                    invalid_candidates[room] = times_visited > 0;
                 }
             }
         }
     }
 
     let mut candidates = vec![];
-    if let Some(last) = path.last() {
-        if last == end {
-            return candidates;
-        }
-        if let Some(ns) = graph.get(last) {
-            for v in ns {
-                if !invalid_candidates.contains(v) {
-                    candidates.push(*v);
-                }
+    if last == end {
+        return candidates;
+    }
+    if let Some(neighbours) = graph.get(last) {
+        for neighbouring_room in neighbours {
+            if !invalid_candidates[*neighbouring_room as usize] {
+                candidates.push(*neighbouring_room);
             }
         }
     }
@@ -65,22 +64,25 @@ fn construct_candidates(
 
 fn backtrack(
     graph: &Graph,
-    small_rooms: &HashSet<Vertex>,
+    small_rooms: &[u8; 1 << 8],
     start: &Vertex,
     end: &Vertex,
     policy: &Policy,
     path: &mut Vec<Vertex>,
+    rooms_visited: &mut [usize; 1 << 8],
     solution_count: &mut usize,
 ) {
     if path.last() == Some(end) {
         *solution_count += 1;
         return;
     }
-    let candidates = construct_candidates(path, graph, small_rooms, start, end, policy);
+    let candidates = construct_candidates(path, graph, small_rooms, start, end, rooms_visited, policy);
 
     for candidate in candidates {
         path.push(candidate);
-        backtrack(graph, small_rooms, start, end, policy, path, solution_count);
+        rooms_visited[candidate as usize] = rooms_visited[candidate as usize] + 1;
+        backtrack(graph, small_rooms, start, end, policy, path, rooms_visited, solution_count);
+        rooms_visited[candidate as usize] = rooms_visited[candidate as usize] - 1;
         path.pop();
     }
 }
@@ -106,11 +108,14 @@ fn main() {
         .map(|(idx, room)| (*room, idx as u8))
         .collect::<HashMap<_, _>>();
 
-    let small_rooms = room_map
+    let mut small_rooms = [0; 1 << 8];
+
+     for room in room_map
         .iter()
         .filter(|(k, _)| k.to_string() == k.to_lowercase())
-        .map(|(_, v)| *v)
-        .collect::<HashSet<_>>();
+        .map(|(_, v)| v) {
+            small_rooms[*room as usize] = 1;
+        }
     let start = room_map.get("start").unwrap();
     let end = room_map.get("end").unwrap();
 
@@ -125,6 +130,7 @@ fn main() {
     }
 
     let mut path_part_1 = vec![];
+    let mut rooms_visited_part_1 = [0; 1 << 8];
     let mut path_count_part_1 = 0;
 
     backtrack(
@@ -134,12 +140,14 @@ fn main() {
         end,
         &Policy::Part1,
         &mut path_part_1,
+        &mut rooms_visited_part_1,
         &mut path_count_part_1,
     );
 
     println!("{}", path_count_part_1);
 
     let mut path_part_2 = vec![];
+    let mut rooms_visited_part_2 = [0; 1 << 8];
     let mut path_count_part_2 = 0;
 
     backtrack(
@@ -149,6 +157,7 @@ fn main() {
         end,
         &Policy::Part2,
         &mut path_part_2,
+        &mut rooms_visited_part_2,
         &mut path_count_part_2,
     );
     
