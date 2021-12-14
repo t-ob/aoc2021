@@ -80,9 +80,9 @@ fn backtrack(
 
     for candidate in candidates {
         path.push(candidate);
-        rooms_visited[candidate as usize] = rooms_visited[candidate as usize] + 1;
+        rooms_visited[candidate as usize] += 1;
         backtrack(graph, small_rooms, start, end, policy, path, rooms_visited, solution_count);
-        rooms_visited[candidate as usize] = rooms_visited[candidate as usize] - 1;
+        rooms_visited[candidate as usize] -= 1;
         path.pop();
     }
 }
