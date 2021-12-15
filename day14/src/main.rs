@@ -48,13 +48,13 @@ fn main() {
         for pair in pairs.iter() {
             let pair_count = pair_counts[*pair as usize];
             if pair_count > 0 {
-                let aaa = mapping[*pair as usize];
-                let lhs = 27 * (pair / 27) + aaa;
-                let rhs = 27 * aaa + pair % 27;
+                let mapped_char = mapping[*pair as usize];
+                let lhs = 27 * (pair / 27) + mapped_char;
+                let rhs = 27 * mapped_char + pair % 27;
                 pair_diffs[*pair as usize] -= pair_count;
                 pair_diffs[lhs as usize] += pair_count;
                 pair_diffs[rhs as usize] += pair_count;
-                char_counts[aaa as usize] += pair_count as usize;
+                char_counts[mapped_char as usize] += pair_count as usize;
             }
         }
 
