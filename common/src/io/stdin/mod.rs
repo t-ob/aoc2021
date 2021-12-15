@@ -48,12 +48,26 @@ pub fn read_csv_line<T: FromStr>() -> Option<Vec<T>> {
     None
 }
 
+pub fn read_line<T: FromStr>() -> Option<T> {
+    let stdin = std::io::stdin();
+    let mut buf = String::new();
+
+    if stdin.read_line(&mut buf).is_ok() {
+        return buf
+            .trim()
+            .parse::<T>()
+            .ok()
+    }
+
+    None
+}
+
 pub fn read_line_with<T>(f: fn(&str) -> Option<T>) -> Option<T> {
     let stdin = std::io::stdin();
     let mut buf = String::new();
 
     if stdin.read_line(&mut buf).is_ok() {
-        return f(&buf);
+        return f(&buf.trim());
     }
 
     None
