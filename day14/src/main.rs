@@ -5,7 +5,8 @@ fn digit(c: char) -> u16 {
 }
 
 fn main() {
-    let mut template = stdin::read_line_with::<Vec<u16>>(|line| Some(line.chars().map(digit).collect())).unwrap();
+    let template =
+        stdin::read_line_with::<Vec<u16>>(|line| Some(line.chars().map(digit).collect())).unwrap();
 
     let rules = stdin::collect_into_vec_with::<(u16, u16)>(|line| {
         let mut tokens = line.split(" -> ");
@@ -15,10 +16,10 @@ fn main() {
                 let mut result_chars = result.chars();
                 match ((pair_chars.next(), pair_chars.next()), result_chars.next()) {
                     ((Some(c), Some(d)), Some(r)) => Some((27 * digit(c) + digit(d), digit(r))),
-                    _ => return None
+                    _ => return None,
                 }
-            },
-           _ => None
+            }
+            _ => None,
         }
     });
 
@@ -43,7 +44,7 @@ fn main() {
     let mut iteration = 0;
 
     while iteration < 40 {
-        let mut pair_diffs  = [0i64; 1 << 10];
+        let mut pair_diffs = [0i64; 1 << 10];
 
         for pair in pairs.iter() {
             let pair_count = pair_counts[*pair as usize];
@@ -58,7 +59,7 @@ fn main() {
             }
         }
 
-        for (x, y)in pair_counts.iter_mut().zip(pair_diffs) {
+        for (x, y) in pair_counts.iter_mut().zip(pair_diffs) {
             *x += y;
         }
 
